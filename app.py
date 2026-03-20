@@ -4,22 +4,22 @@ import re
 import os
 from pathlib import Path
 from joblib import load
+from sentence_transformers import SentenceTransformer
 
 # ---------- MODEL PATHS ----------
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_DIR = Path(os.environ.get("MODEL_ARTIFACTS_PATH", BASE_DIR / "model_artifacts"))
-EMBED_MODEL_PATH = MODEL_DIR / "embedding_model.joblib"
 UMAP_MODEL_PATH = MODEL_DIR / "umap_model.joblib"
 KMEANS_PATH = MODEL_DIR / "kmeans_umap.joblib"
 # ---------------------------------
 
 
 # Load models
-if not EMBED_MODEL_PATH.exists() or not UMAP_MODEL_PATH.exists() or not KMEANS_PATH.exists():
+if not UMAP_MODEL_PATH.exists() or not KMEANS_PATH.exists():
     st.error("Model files not found. Please check model_artifacts path and ensure joblib files are available.")
     st.stop()
 
-embed_model = load(EMBED_MODEL_PATH)
+embed_model = SentenceTransformer("all-MiniLM-L6-v2")
 umap_model = load(UMAP_MODEL_PATH)
 kmeans = load(KMEANS_PATH)
 
