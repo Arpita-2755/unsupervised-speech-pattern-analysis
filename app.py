@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from joblib import load
 from sentence_transformers import SentenceTransformer
+import requests
 
 # ---------- MODEL PATHS ----------
 BASE_DIR = Path(__file__).resolve().parent
@@ -13,6 +14,23 @@ UMAP_MODEL_PATH = MODEL_DIR / "umap_model.joblib"
 KMEANS_PATH = MODEL_DIR / "kmeans_umap.joblib"
 # ---------------------------------
 
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+external_base = os.environ.get("MODEL_BASE_URL", "https://github.com/Arpita-2755/unsupervised-speech-pattern-analysis/releases/download/v1.1")
+
+download_map = {
+    "umap_model.joblib": f"{external_base}/umap_model.joblib",
+    "kmeans_umap.joblib": f"{external_base}/kmeans_umap.joblib",
+}
+
+for fname, url in download_map.items():
+    dst = MODEL_DIR / fname
+    if not dst.exists():
+        res = requests.get(url, stream=True)
+        res.raise_for_status()
+        with open(dst, "wb") as f:
+            for chunk in res.iter_content(chunk_size=8192):
+                f.write(chunk)
 
 # Load models
 if not UMAP_MODEL_PATH.exists() or not KMEANS_PATH.exists():
