@@ -1,16 +1,24 @@
 import streamlit as st
 import numpy as np
 import re
+import os
+from pathlib import Path
 from joblib import load
 
 # ---------- MODEL PATHS ----------
-EMBED_MODEL_PATH = r"C:\Users\wisdo\Documents\ML2 Project\model_artifacts\embedding_model.joblib"
-UMAP_MODEL_PATH  = r"C:\Users\wisdo\Documents\ML2 Project\model_artifacts\umap_model.joblib"
-KMEANS_PATH      = r"C:\Users\wisdo\Documents\ML2 Project\model_artifacts\kmeans_umap.joblib"
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_DIR = Path(os.environ.get("MODEL_ARTIFACTS_PATH", BASE_DIR / "model_artifacts"))
+EMBED_MODEL_PATH = MODEL_DIR / "embedding_model.joblib"
+UMAP_MODEL_PATH = MODEL_DIR / "umap_model.joblib"
+KMEANS_PATH = MODEL_DIR / "kmeans_umap.joblib"
 # ---------------------------------
 
 
 # Load models
+if not EMBED_MODEL_PATH.exists() or not UMAP_MODEL_PATH.exists() or not KMEANS_PATH.exists():
+    st.error("Model files not found. Please check model_artifacts path and ensure joblib files are available.")
+    st.stop()
+
 embed_model = load(EMBED_MODEL_PATH)
 umap_model = load(UMAP_MODEL_PATH)
 kmeans = load(KMEANS_PATH)
